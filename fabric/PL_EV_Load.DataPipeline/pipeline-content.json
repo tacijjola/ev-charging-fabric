@@ -1,0 +1,110 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "name": "1 Bronze ingest",
+        "description": "(nb_01)",
+        "type": "Wait",
+        "dependsOn": [],
+        "typeProperties": {
+          "waitTimeInSeconds": 1
+        }
+      },
+      {
+        "name": "2 Silver transform",
+        "description": "loads yearly CSVs into bronze_sessions",
+        "type": "Wait",
+        "dependsOn": [
+          {
+            "activity": "1 Bronze ingest",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "typeProperties": {
+          "waitTimeInSeconds": 1
+        }
+      },
+      {
+        "name": "3 Reference data",
+        "description": " (DF_EV_Reference)",
+        "type": "Wait",
+        "dependsOn": [
+          {
+            "activity": "2 Silver transform",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "typeProperties": {
+          "waitTimeInSeconds": 1
+        }
+      },
+      {
+        "name": "4 Copy rejects to WH",
+        "type": "Wait",
+        "dependsOn": [
+          {
+            "activity": "3 Reference data",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "typeProperties": {
+          "waitTimeInSeconds": 1
+        }
+      },
+      {
+        "name": "5 Gold star schema",
+        "description": "sp_run_gold_load",
+        "type": "Wait",
+        "dependsOn": [
+          {
+            "activity": "4 Copy rejects to WH",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "typeProperties": {
+          "waitTimeInSeconds": 1
+        }
+      },
+      {
+        "name": "6 Reconciliation",
+        "description": "nb_03",
+        "type": "Wait",
+        "dependsOn": [
+          {
+            "activity": "5 Gold star schema",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "typeProperties": {
+          "waitTimeInSeconds": 1
+        }
+      },
+      {
+        "name": "7 Refresh model",
+        "description": "SM_EV_Charging",
+        "type": "Wait",
+        "dependsOn": [
+          {
+            "activity": "6 Reconciliation",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "typeProperties": {
+          "waitTimeInSeconds": 1
+        }
+      }
+    ]
+  }
+}
