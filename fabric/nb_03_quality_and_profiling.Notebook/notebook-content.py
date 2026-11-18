@@ -1,5 +1,24 @@
 # Fabric notebook source
 
+# METADATA ********************
+
+# META {
+# META   "kernel_info": {
+# META     "name": "synapse_pyspark"
+# META   },
+# META   "dependencies": {
+# META     "lakehouse": {
+# META       "default_lakehouse": "a42e0e22-76d4-4ca4-a363-88f4a5e06735",
+# META       "default_lakehouse_name": "LH_EV",
+# META       "default_lakehouse_workspace_id": "ffb7a8a2-5e81-4faf-8d12-ece0214fe2f1",
+# META       "known_lakehouses": [
+# META         {
+# META           "id": "a42e0e22-76d4-4ca4-a363-88f4a5e06735"
+# META         }
+# META       ]
+# META     }
+# META   }
+# META }
 
 # MARKDOWN ********************
 
@@ -16,6 +35,13 @@ from pyspark.sql import functions as F
 from datetime import datetime
 
 s = spark.table("silver_sessions")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
 
 # MARKDOWN ********************
 
@@ -48,6 +74,13 @@ dq.write.format("delta").mode("append").saveAsTable("dq_results")
 display(dq)
 assert all(r[5] for r in rows), "Reconciliation failed — read the table above before going further."
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
 # MARKDOWN ********************
 
 # ## Part B · Profiling and statistics in pandas
@@ -73,6 +106,13 @@ profile = pd.DataFrame({
 display(profile)
 display(pdf.describe(percentiles=[.25, .5, .75, .95, .99]).T.round(2))
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
 # MARKDOWN ********************
 
 # ### Distribution: session energy is right-skewed → the median describes a "typical" session better than the mean
@@ -86,6 +126,13 @@ print(f"mean {e.mean():.2f} kWh · median {e.median():.2f} kWh · skewness {e.sk
 q1, q3 = e.quantile([.25, .75]); iqr = q3 - q1
 upper = q3 + 1.5 * iqr
 print(f"IQR fence: > {upper:.1f} kWh → {(e > upper).mean():.1%} of sessions flagged as high-energy outliers")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
 
 # MARKDOWN ********************
 
@@ -113,3 +160,10 @@ try:
           " it still does not prove the fee caused it (ports, sites and demand changed too).")
 except ImportError:
     print("scipy not available in this runtime — skip the test, keep the medians.")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
