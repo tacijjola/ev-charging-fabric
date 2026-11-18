@@ -1,5 +1,24 @@
 # Fabric notebook source
 
+# METADATA ********************
+
+# META {
+# META   "kernel_info": {
+# META     "name": "synapse_pyspark"
+# META   },
+# META   "dependencies": {
+# META     "lakehouse": {
+# META       "default_lakehouse": "a42e0e22-76d4-4ca4-a363-88f4a5e06735",
+# META       "default_lakehouse_name": "LH_EV",
+# META       "default_lakehouse_workspace_id": "ffb7a8a2-5e81-4faf-8d12-ece0214fe2f1",
+# META       "known_lakehouses": [
+# META         {
+# META           "id": "a42e0e22-76d4-4ca4-a363-88f4a5e06735"
+# META         }
+# META       ]
+# META     }
+# META   }
+# META }
 
 # MARKDOWN ********************
 
@@ -18,6 +37,13 @@
 
 process_years = ""          # "" = all years in bronze; or e.g. "2020" for an incremental run
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
 # CELL ********************
 
 from pyspark.sql import functions as F, Window
@@ -26,6 +52,13 @@ from delta.tables import DeltaTable
 src = spark.table("bronze_sessions")
 if process_years:
     src = src.where(F.col("load_year").isin([int(y) for y in process_years.split(",")]))
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
 
 # MARKDOWN ********************
 
@@ -67,6 +100,13 @@ typed = (src
     .withColumn("ended_by", F.coalesce(blank_to_null("ended_by"), F.lit("(blank)")))
 )
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
 # MARKDOWN ********************
 
 # ### 2 · Keys: port (station) and site
@@ -90,6 +130,13 @@ typed = (typed
     .withColumn("is_paid", F.col("fee_usd") > 0)
     .withColumn("session_id", F.sha2(F.concat_ws("|", "plug_in_event_id", "station_name_raw", "start_date"), 256))
 )
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
 
 # MARKDOWN ********************
 
@@ -117,6 +164,13 @@ silver_cols = ["session_id", "plug_in_event_id", "station_name", "station_name_r
                "load_year", "_source_file"]
 clean = clean.select(*silver_cols).withColumn("_silver_updated_at", F.current_timestamp())
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
 # MARKDOWN ********************
 
 # ### 4 · Write — MERGE (upsert) so reruns and late files never duplicate
@@ -140,6 +194,13 @@ if process_years and spark.catalog.tableExists("silver_qa_rejected"):
     rej_writer = rej_writer.option("replaceWhere", f"load_year IN ({process_years})")
 rej_writer.saveAsTable("silver_qa_rejected")
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
 # CELL ********************
 
 # Checks — compare with 01_Data/expected_results/reconciliation_targets.csv (R02–R08)
@@ -154,3 +215,10 @@ SELECT
   (SELECT COUNT(DISTINCT station_name) FROM silver_sessions)               AS ports,                -- R13: 46
   (SELECT COUNT(DISTINCT site_code) FROM silver_sessions)                  AS sites                 -- R12: 9
 """))
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
