@@ -1,0 +1,156 @@
+table dim_site
+	lineageTag: c46a241a-d954-4ded-8d64-d7399ebbe6e2
+	sourceLineageTag: [gold].[dim_site]
+
+	column site_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: e1dea6e5-4b3e-4b1a-aea1-1e5cc85f4b97
+		sourceLineageTag: site_key
+		summarizeBy: none
+		sourceColumn: site_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column site_code
+		dataType: string
+		sourceProviderType: varchar(30)
+		lineageTag: caeb01d0-43e6-44fc-b582-a949a75e6136
+		sourceLineageTag: site_code
+		summarizeBy: none
+		sourceColumn: site_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column site_name
+		dataType: string
+		sourceProviderType: varchar(50)
+		lineageTag: 17c12d7c-3551-4a11-8479-69e8767532e7
+		sourceLineageTag: site_name
+		summarizeBy: none
+		sourceColumn: site_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column address
+		dataType: string
+		sourceProviderType: varchar(100)
+		lineageTag: 208428bb-b7b3-4652-ae6a-4039dc74175a
+		sourceLineageTag: address
+		summarizeBy: none
+		sourceColumn: address
+
+		annotation SummarizationSetBy = Automatic
+
+	column postal_code
+		dataType: string
+		sourceProviderType: varchar(10)
+		lineageTag: a4ce15e9-dca9-455e-96b8-fc428ec506e3
+		sourceLineageTag: postal_code
+		summarizeBy: none
+		sourceColumn: postal_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column latitude
+		dataType: double
+		sourceProviderType: float
+		lineageTag: fb019788-c3bf-49e1-97e0-efc9e84b9de1
+		sourceLineageTag: latitude
+		summarizeBy: none
+		sourceColumn: latitude
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column longitude
+		dataType: double
+		sourceProviderType: float
+		lineageTag: 7534102f-14d3-4154-b7d3-08e33d9820a1
+		sourceLineageTag: longitude
+		summarizeBy: none
+		sourceColumn: longitude
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column port_count
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 5a8695e6-592d-44e2-9ae1-f315b5e1afb4
+		sourceLineageTag: port_count
+		summarizeBy: none
+		sourceColumn: port_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_session_date
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: date
+		lineageTag: 76a39924-a1ed-4ef6-83f6-173cd1100e29
+		sourceLineageTag: first_session_date
+		summarizeBy: none
+		sourceColumn: first_session_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column fee_policy
+		dataType: string
+		sourceProviderType: varchar(10)
+		lineageTag: d51943fd-aa30-4ad8-a52f-73b3f7ae85e7
+		sourceLineageTag: fee_policy
+		summarizeBy: none
+		sourceColumn: fee_policy
+
+		annotation SummarizationSetBy = Automatic
+
+	column valid_from
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: date
+		lineageTag: 47f9e6b5-3b9f-460d-9d9e-0804bdf5689f
+		sourceLineageTag: valid_from
+		summarizeBy: none
+		sourceColumn: valid_from
+
+		annotation SummarizationSetBy = Automatic
+
+	column valid_to
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: date
+		lineageTag: 04f4ff1d-442f-40b9-840c-02d18d34a253
+		sourceLineageTag: valid_to
+		summarizeBy: none
+		sourceColumn: valid_to
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_current
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: c4ad39d8-f48a-473a-bcd9-9638037fa686
+		sourceLineageTag: is_current
+		summarizeBy: none
+		sourceColumn: is_current
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_site = entity
+		mode: directLake
+		source
+			entityName: dim_site
+			schemaName: gold
+			expressionSource: DatabaseQuery
+
+	annotation PBI_ResultType = Table
+

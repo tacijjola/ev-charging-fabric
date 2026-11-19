@@ -1,0 +1,24 @@
+relationship 4a84ecb6-3a5d-980d-3f24-9ca77769e1cc
+	fromColumn: fact_sessions.date_key
+	toColumn: dim_date.date_key
+
+relationship 1fa20cc6-2f41-c7bd-2ded-28e10b7ecee3
+	fromColumn: fact_sessions.end_reason_key
+	toColumn: dim_end_reason.end_reason_key
+
+relationship ec6e8f3c-b92b-1835-d63f-05a2b425333d
+	fromColumn: fact_sessions.site_key
+	toColumn: dim_site.site_key
+
+relationship 876a88fa-7da3-284b-3ded-5283992a83c9
+	fromColumn: fact_sessions.station_key
+	toColumn: dim_station.station_key
+
+relationship b7f5c49e-d032-ef82-93a3-4a123366b5ef
+	fromColumn: fact_sessions.hour_of_day
+	toColumn: dim_time.hour_of_day
+
+relationship 43a86155-5512-88a5-646e-4d1736e6f68a
+	fromColumn: fact_sessions.user_key
+	toColumn: dim_user.user_key
+

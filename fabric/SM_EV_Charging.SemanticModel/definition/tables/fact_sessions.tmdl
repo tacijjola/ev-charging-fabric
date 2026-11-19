@@ -1,0 +1,510 @@
+table fact_sessions
+	lineageTag: fbfacea6-63ba-490f-8320-825de1849ded
+	sourceLineageTag: [gold].[fact_sessions]
+
+	measure Sessions = COUNTROWS(fact_sessions)
+		formatString: 0
+		displayFolder: Sessions data
+		lineageTag: 64c31a84-f285-4f80-88b5-8c0a9f86f8dc
+
+		changedProperty = Name
+
+		changedProperty = DisplayFolder
+
+	measure 'Energy kWh' = SUM ( fact_sessions[energy_kwh] )
+		displayFolder: Energy
+		lineageTag: 7bc2980e-5a55-4869-bbdc-a947df67ed23
+
+		changedProperty = Name
+
+		changedProperty = DisplayFolder
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Energy MWh' = DIVIDE ( [Energy kWh], 1000 )
+		displayFolder: Energy
+		lineageTag: d5103df1-7691-440e-9c24-9d29a688e9f4
+
+		changedProperty = Name
+
+		changedProperty = DisplayFolder
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue USD' = SUM ( fact_sessions[fee_usd] )
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Sessions data
+		lineageTag: 5e54b0fb-9832-4fed-97f2-91bf9a3e850c
+
+		changedProperty = Name
+
+		changedProperty = DisplayFolder
+
+		annotation PBI_FormatHint = {"currencyCulture":"en"}
+
+	measure 'Plugged-in Minutes' = SUM ( fact_sessions[total_min] )
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Sessions data
+		lineageTag: 24ee3586-f086-4722-81fd-fa4ff205e029
+
+		changedProperty = Name
+
+		changedProperty = DisplayFolder
+
+		annotation PBI_FormatHint = {"currencyCulture":"en"}
+
+	measure 'Active Users' = ```
+			
+			CALCULATE (
+			    DISTINCTCOUNT ( fact_sessions[user_key] ),
+			    fact_sessions[user_key] <> -1                 // 7,677 sessions have no user id
+			)
+			
+			```
+		formatString: 0
+		displayFolder: Sessions data
+		lineageTag: fe8d4b6b-6572-49b2-a5e8-d7f14ab3632f
+
+		changedProperty = Name
+
+		changedProperty = DisplayFolder
+
+	measure 'Idle Minutes' = SUM ( fact_sessions[idle_min] )
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: Sessions data
+		lineageTag: 899438f2-6737-4dd4-b8f9-7becb7abd785
+
+		changedProperty = Name
+
+		changedProperty = DisplayFolder
+
+		annotation PBI_FormatHint = {"currencyCulture":"en"}
+
+	/// Capacity
+	measure 'Port Days' = ```
+			
+			VAR _MinDate = MIN ( dim_date[date] )
+			VAR _MaxDate = MAX ( dim_date[date] )
+			VAR _Ports =
+			    CALCULATETABLE (
+			        VALUES ( dim_station[station_key] ),
+			        TREATAS ( VALUES ( dim_site[site_code] ), dim_station[site_code] )
+			    )
+			RETURN
+			    SUMX (
+			        _Ports,
+			        VAR _FirstSession = CALCULATE ( MIN ( dim_station[first_session_date] ) )
+			        VAR _StartInPeriod = MAX ( _FirstSession, _MinDate )
+			        RETURN MAX ( 0, INT ( _MaxDate - _StartInPeriod ) + 1 )
+			    )
+			
+			// Port-days: each port counts from its first session, never from the start of the period.// (Finding #1 in the report: the old denominator made late sites look idle.)// dim_station is not filtered by dim_site through the fact table, so TREATAS passes the site filter across.
+			
+			```
+		formatString: 0
+		displayFolder: Capacity
+		lineageTag: d3f67608-cdab-4cb5-8a57-db665a6dfbf8
+
+		changedProperty = Name
+
+		changedProperty = Description
+
+		changedProperty = DisplayFolder
+
+	measure 'kWh per Port per Day' = DIVIDE ( [Energy kWh], [Port Days] )              // network 33.9 · Webster 62.9
+		formatString: 0
+		displayFolder: Capacity
+		lineageTag: f47d7358-f3ba-4d65-b73c-fe22a9c53fa1
+
+		changedProperty = Name
+
+		changedProperty = Description
+
+		changedProperty = FormatString
+
+		changedProperty = DisplayFolder
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Utilisation %' = DIVIDE ( [Plugged-in Minutes], [Port Days] * 1440 )     // network 41.1 % · Webster 74.5 %
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: Capacity
+		lineageTag: ca6989b0-e241-432d-9e6f-7941525b7c58
+
+		changedProperty = Name
+
+		changedProperty = DisplayFolder
+
+		changedProperty = FormatString
+
+	measure 'Idle Share %' = DIVIDE ( [Idle Minutes], [Plugged-in Minutes] )          // network 19.6 %
+		formatString: 0
+		displayFolder: Capacity
+		lineageTag: fec788fa-85c9-4b13-ad05-74fa7ffc3cc2
+
+		changedProperty = Name
+
+		changedProperty = DisplayFolder
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Fault Rate %' = ```
+			
+			DIVIDE (
+			    CALCULATE ( [Sessions], dim_end_reason[is_fault] = TRUE () ),
+			    [Sessions]
+			)
+			
+			```
+		formatString: 0
+		displayFolder: Capacity
+		lineageTag: 128cae5e-b893-4e76-a2f2-8588392cb32e
+
+		changedProperty = Name
+
+		changedProperty = FormatString
+
+		changedProperty = DisplayFolder
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Revenue per kWh' = DIVIDE ( [Revenue USD], [Energy kWh] )                // $0.13
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: Capacity
+		lineageTag: 9d1a9f75-2b34-4e97-a3d8-240ea672dd48
+
+		changedProperty = Name
+
+		changedProperty = DisplayFolder
+
+		changedProperty = FormatString
+
+	measure 'Site Rank (kWh per Port per Day)' = ```
+			
+			IF (                                                                      //Ranking with window functions
+			    ISINSCOPE ( dim_site[site_name] ),                                   // information function
+			    RANK (
+			        DENSE,
+			        ALLSELECTED ( dim_site[site_name] ),
+			        ORDERBY ( [kWh per Port per Day], DESC )
+			    )
+			)
+			
+			```
+		formatString: 0
+		displayFolder: Analysis
+		lineageTag: fca16758-d844-404e-b79f-e9033903454e
+
+		changedProperty = Name
+
+		changedProperty = DisplayFolder
+
+	measure 'Energy kWh Rolling 12M' = ```
+			
+			CALCULATE (
+			    [Energy kWh],                               // Rolling 12-month energy with WINDOW over the month grain
+			    WINDOW (
+			        -11, REL, 0, REL,
+			        ALLSELECTED ( dim_date[year_month_sort] ),
+			        ORDERBY ( dim_date[year_month_sort], ASC )
+			    )
+			)
+			
+			```
+		displayFolder: Analysis
+		lineageTag: e810a057-5f3e-485c-9e28-8a681461d5aa
+
+		changedProperty = Name
+
+		changedProperty = DisplayFolder
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Top 1% User Share' = ```
+			// Share of sessions taken by the top 1 % of users (report: 31 %) — iterator + TOPN
+			VAR _Users =                       
+			    FILTER ( VALUES ( dim_user[user_key] ), dim_user[user_key] <> -1 )
+			VAR _N = ROUNDDOWN ( COUNTROWS ( _Users ) * 0.01, 0 )
+			VAR _TopUsers = TOPN ( _N, _Users, CALCULATE ( [Sessions] ), DESC )
+			RETURN
+			    DIVIDE (
+			        CALCULATE ( [Sessions], _TopUsers ),
+			        CALCULATE ( [Sessions], fact_sessions[user_key] <> -1 )
+			    )
+			
+			```
+		displayFolder: Analysis
+		lineageTag: 469d71a3-1746-458e-ae3b-894b049e01d7
+
+		changedProperty = Name
+
+		changedProperty = DisplayFolder
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Title Site Performance' = ```
+			// Guarded dynamic title: states a finding only when the data supports it.
+			VAR _Top =
+			    TOPN ( 1, ALLSELECTED ( dim_site[site_name] ), [kWh per Port per Day], DESC )
+			VAR _TopName = MAXX ( _Top, dim_site[site_name] )
+			VAR _TopValue = MAXX ( _Top, [kWh per Port per Day] )
+			VAR _Network = CALCULATE ( [kWh per Port per Day], ALLSELECTED ( dim_site ) )
+			RETURN
+			    IF (
+			        COUNTROWS ( ALLSELECTED ( dim_site[site_name] ) ) > 1 && _TopValue > _Network,
+			        _TopName & " works hardest per port: "
+			            & FORMAT ( _TopValue, "0.0" ) & " kWh per port per day, "
+			            & FORMAT ( DIVIDE ( _TopValue, _Network ), "0.0" ) & "× the network",
+			        "kWh per port per day by site"
+			    )
+			
+			```
+		displayFolder: Titles
+		lineageTag: 8f7ed0f9-2e6d-4a16-849f-925cdc0a2fae
+
+		changedProperty = Name
+
+		changedProperty = DisplayFolder
+
+	measure 'Sessions Flagged Negative Idle' = CALCULATE ( [Sessions], fact_sessions[is_duration_anomaly] = TRUE () )
+		formatString: 0
+		displayFolder: Quality
+		lineageTag: 10207e80-68e7-45d8-b481-81c9ca28ca55
+
+		changedProperty = Name
+
+		changedProperty = DisplayFolder
+
+	measure 'Sessions Over 24h' = CALCULATE ( [Sessions], fact_sessions[is_long_session] = TRUE () )
+		formatString: 0
+		displayFolder: Quality
+		lineageTag: 25079335-8d71-4429-ae7b-335f018f8711
+
+		changedProperty = Name
+
+		changedProperty = DisplayFolder
+
+	column session_id
+		dataType: string
+		sourceProviderType: varchar(64)
+		lineageTag: 905d8a06-e166-479d-a710-35248761a1b3
+		sourceLineageTag: session_id
+		summarizeBy: none
+		sourceColumn: session_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: c3879f70-ceaf-4cd1-9158-569b059f4dff
+		sourceLineageTag: date_key
+		summarizeBy: none
+		sourceColumn: date_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column hour_of_day
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 0bb8a3e2-2cee-42bd-b2c0-f36c9689e8cf
+		sourceLineageTag: hour_of_day
+		summarizeBy: none
+		sourceColumn: hour_of_day
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column station_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 9eed5f88-edfe-48dd-9b8b-e59c245db70d
+		sourceLineageTag: station_key
+		summarizeBy: none
+		sourceColumn: station_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column site_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 35f9c0eb-f90e-410d-9543-760ea2791a29
+		sourceLineageTag: site_key
+		summarizeBy: none
+		sourceColumn: site_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 01ad8fe8-a1fa-484f-937b-91dc844d02e4
+		sourceLineageTag: user_key
+		summarizeBy: none
+		sourceColumn: user_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column end_reason_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 89b91097-ad90-431f-8438-232d8ef93c62
+		sourceLineageTag: end_reason_key
+		summarizeBy: none
+		sourceColumn: end_reason_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column duration_band
+		dataType: string
+		sourceProviderType: varchar(6)
+		lineageTag: 4df11d0c-2479-4e4f-bb5b-429400645b69
+		sourceLineageTag: duration_band
+		summarizeBy: none
+		sourceColumn: duration_band
+
+		annotation SummarizationSetBy = Automatic
+
+	column energy_kwh
+		dataType: double
+		sourceProviderType: float
+		lineageTag: dc8e07c2-79e8-42b3-bba7-2355fda5df64
+		sourceLineageTag: energy_kwh
+		summarizeBy: sum
+		sourceColumn: energy_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column fee_usd
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		sourceProviderType: decimal(10, 2)
+		lineageTag: 779cd6a5-eeee-4b88-990d-226e55d84349
+		sourceLineageTag: fee_usd
+		summarizeBy: sum
+		sourceColumn: fee_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column ghg_kg
+		dataType: double
+		sourceProviderType: float
+		lineageTag: 71fe0f1d-6619-41c4-8bb5-5944138a7b60
+		sourceLineageTag: ghg_kg
+		summarizeBy: sum
+		sourceColumn: ghg_kg
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column total_min
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		sourceProviderType: decimal(9, 1)
+		lineageTag: 2d233023-54cb-47bd-bbb7-df508f1c6840
+		sourceLineageTag: total_min
+		summarizeBy: sum
+		sourceColumn: total_min
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column charging_min
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		sourceProviderType: decimal(9, 1)
+		lineageTag: db4f5a5d-ae83-4e8c-b6f7-f14c74a079cc
+		sourceLineageTag: charging_min
+		summarizeBy: sum
+		sourceColumn: charging_min
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column idle_min
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		sourceProviderType: decimal(9, 1)
+		lineageTag: 944c9b54-ea3a-43d9-ab55-0a0e940c3ae1
+		sourceLineageTag: idle_min
+		summarizeBy: sum
+		sourceColumn: idle_min
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column is_paid
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: d4e6fcd0-80fe-4812-b7dd-819a58e6665d
+		sourceLineageTag: is_paid
+		summarizeBy: none
+		sourceColumn: is_paid
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_duration_anomaly
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: 08274daa-a925-4ef6-ad52-62684ef4bb6a
+		sourceLineageTag: is_duration_anomaly
+		summarizeBy: none
+		sourceColumn: is_duration_anomaly
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_long_session
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: 89489b0a-9f49-4a6f-94f2-7f2863c84c7a
+		sourceLineageTag: is_long_session
+		summarizeBy: none
+		sourceColumn: is_long_session
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_sessions = entity
+		mode: directLake
+		source
+			entityName: fact_sessions
+			schemaName: gold
+			expressionSource: DatabaseQuery
+
+	annotation PBI_ResultType = Table
+

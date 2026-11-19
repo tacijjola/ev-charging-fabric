@@ -1,0 +1,42 @@
+table security_site_manager
+	isHidden
+	lineageTag: 25a6a743-cab1-4994-aba0-594ca1b0979e
+	sourceLineageTag: [gold].[security_site_manager]
+
+	column site_code
+		dataType: string
+		isHidden
+		sourceProviderType: varchar(30)
+		lineageTag: a515bc7a-33b3-480c-8c1a-f2962d338728
+		sourceLineageTag: site_code
+		summarizeBy: none
+		sourceColumn: site_code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column manager_upn
+		dataType: string
+		isHidden
+		sourceProviderType: varchar(100)
+		lineageTag: 914c4999-85e8-46b2-ab55-4e3249e230a3
+		sourceLineageTag: manager_upn
+		summarizeBy: none
+		sourceColumn: manager_upn
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition security_site_manager = entity
+		mode: directLake
+		source
+			entityName: security_site_manager
+			schemaName: gold
+			expressionSource: DatabaseQuery
+
+	changedProperty = IsHidden
+
+	annotation PBI_ResultType = Table
+

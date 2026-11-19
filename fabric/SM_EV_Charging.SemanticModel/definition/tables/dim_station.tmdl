@@ -1,0 +1,123 @@
+table dim_station
+	lineageTag: b9d80ce5-3c8f-4d7b-a7d0-e6b70b9de80d
+	sourceLineageTag: [gold].[dim_station]
+
+	column station_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 91e3a615-6fbd-4c8f-bd4f-684e5df7b241
+		sourceLineageTag: station_key
+		summarizeBy: none
+		sourceColumn: station_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column station_name
+		dataType: string
+		sourceProviderType: varchar(60)
+		lineageTag: 61a809bb-af77-4dd2-aef3-d51f2ec4bc4a
+		sourceLineageTag: station_name
+		summarizeBy: none
+		sourceColumn: station_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column port_label
+		dataType: string
+		sourceProviderType: varchar(30)
+		lineageTag: b8320b91-9119-4f1a-902c-f90d2df8e976
+		sourceLineageTag: port_label
+		summarizeBy: none
+		sourceColumn: port_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column site_code
+		dataType: string
+		sourceProviderType: varchar(30)
+		lineageTag: 0c713a21-9b5d-4b22-bdcf-9bd3ec4e3b5b
+		sourceLineageTag: site_code
+		summarizeBy: none
+		sourceColumn: site_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column port_type
+		dataType: string
+		sourceProviderType: varchar(10)
+		lineageTag: ba2b7bcb-0974-4a7d-8d51-5db42a4d6a24
+		sourceLineageTag: port_type
+		summarizeBy: none
+		sourceColumn: port_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column plug_type
+		dataType: string
+		sourceProviderType: varchar(10)
+		lineageTag: fda5c8de-6fce-44f6-bbac-3d2e57acc43c
+		sourceLineageTag: plug_type
+		summarizeBy: none
+		sourceColumn: plug_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column latitude
+		dataType: double
+		sourceProviderType: float
+		lineageTag: d4102e83-384e-4d8b-a32f-98de167d3bd9
+		sourceLineageTag: latitude
+		summarizeBy: none
+		sourceColumn: latitude
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column longitude
+		dataType: double
+		sourceProviderType: float
+		lineageTag: 08fccf73-ede8-492c-b15e-ecb9838653ef
+		sourceLineageTag: longitude
+		summarizeBy: none
+		sourceColumn: longitude
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column first_session_date
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: date
+		lineageTag: e6c240e1-37c4-487c-b299-a6ca69aa821d
+		sourceLineageTag: first_session_date
+		summarizeBy: none
+		sourceColumn: first_session_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column in_service_days
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 3c4b4eb6-59b3-49b3-8add-dcc05a621c9b
+		sourceLineageTag: in_service_days
+		summarizeBy: none
+		sourceColumn: in_service_days
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_station = entity
+		mode: directLake
+		source
+			entityName: dim_station
+			schemaName: gold
+			expressionSource: DatabaseQuery
+
+	annotation PBI_ResultType = Table
+

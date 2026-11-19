@@ -1,0 +1,58 @@
+table dim_end_reason
+	lineageTag: 62953e24-38e2-4282-abe7-d389433f2c11
+	sourceLineageTag: [gold].[dim_end_reason]
+
+	column end_reason_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: a499909d-aae6-416b-adc5-deafad752251
+		sourceLineageTag: end_reason_key
+		summarizeBy: none
+		sourceColumn: end_reason_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ended_by
+		dataType: string
+		sourceProviderType: varchar(40)
+		lineageTag: a5d8a477-e508-4f69-b6cd-4fb4ce91309f
+		sourceLineageTag: ended_by
+		summarizeBy: none
+		sourceColumn: ended_by
+
+		annotation SummarizationSetBy = Automatic
+
+	column end_reason_group
+		dataType: string
+		sourceProviderType: varchar(10)
+		lineageTag: a9fa1c8e-a3cb-413d-97f7-841989f7d27b
+		sourceLineageTag: end_reason_group
+		summarizeBy: none
+		sourceColumn: end_reason_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_fault
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: f31d2b05-5b01-47f9-b34e-bc42f6fbe577
+		sourceLineageTag: is_fault
+		summarizeBy: none
+		sourceColumn: is_fault
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_end_reason = entity
+		mode: directLake
+		source
+			entityName: dim_end_reason
+			schemaName: gold
+			expressionSource: DatabaseQuery
+
+	annotation PBI_ResultType = Table
+
