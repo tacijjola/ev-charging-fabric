@@ -68,6 +68,9 @@ table dim_date
 		sourceLineageTag: month_name
 		summarizeBy: none
 		sourceColumn: month_name
+		sortByColumn: month_no
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -78,6 +81,9 @@ table dim_date
 		sourceLineageTag: year_month
 		summarizeBy: none
 		sourceColumn: year_month
+		sortByColumn: year_month_sort
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -110,6 +116,9 @@ table dim_date
 		sourceLineageTag: weekday_name
 		summarizeBy: none
 		sourceColumn: weekday_name
+		sortByColumn: weekday_no
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 

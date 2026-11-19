@@ -4,7 +4,7 @@ table fact_sessions
 
 	measure Sessions = COUNTROWS(fact_sessions)
 		formatString: 0
-		displayFolder: Sessions data
+		displayFolder: 1 Base
 		lineageTag: 64c31a84-f285-4f80-88b5-8c0a9f86f8dc
 
 		changedProperty = Name
@@ -12,7 +12,7 @@ table fact_sessions
 		changedProperty = DisplayFolder
 
 	measure 'Energy kWh' = SUM ( fact_sessions[energy_kwh] )
-		displayFolder: Energy
+		displayFolder: 1 Base
 		lineageTag: 7bc2980e-5a55-4869-bbdc-a947df67ed23
 
 		changedProperty = Name
@@ -22,7 +22,7 @@ table fact_sessions
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure 'Energy MWh' = DIVIDE ( [Energy kWh], 1000 )
-		displayFolder: Energy
+		displayFolder: 1 Base
 		lineageTag: d5103df1-7691-440e-9c24-9d29a688e9f4
 
 		changedProperty = Name
@@ -33,7 +33,7 @@ table fact_sessions
 
 	measure 'Revenue USD' = SUM ( fact_sessions[fee_usd] )
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
-		displayFolder: Sessions data
+		displayFolder: 1 Base
 		lineageTag: 5e54b0fb-9832-4fed-97f2-91bf9a3e850c
 
 		changedProperty = Name
@@ -44,7 +44,7 @@ table fact_sessions
 
 	measure 'Plugged-in Minutes' = SUM ( fact_sessions[total_min] )
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
-		displayFolder: Sessions data
+		displayFolder: 1 Base
 		lineageTag: 24ee3586-f086-4722-81fd-fa4ff205e029
 
 		changedProperty = Name
@@ -62,7 +62,7 @@ table fact_sessions
 			
 			```
 		formatString: 0
-		displayFolder: Sessions data
+		displayFolder: 1 Base
 		lineageTag: fe8d4b6b-6572-49b2-a5e8-d7f14ab3632f
 
 		changedProperty = Name
@@ -71,7 +71,7 @@ table fact_sessions
 
 	measure 'Idle Minutes' = SUM ( fact_sessions[idle_min] )
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
-		displayFolder: Sessions data
+		displayFolder: 1 Base
 		lineageTag: 899438f2-6737-4dd4-b8f9-7becb7abd785
 
 		changedProperty = Name
@@ -102,7 +102,7 @@ table fact_sessions
 			
 			```
 		formatString: 0
-		displayFolder: Capacity
+		displayFolder: 2 Capacity
 		lineageTag: d3f67608-cdab-4cb5-8a57-db665a6dfbf8
 
 		changedProperty = Name
@@ -113,7 +113,7 @@ table fact_sessions
 
 	measure 'kWh per Port per Day' = DIVIDE ( [Energy kWh], [Port Days] )              // network 33.9 · Webster 62.9
 		formatString: 0
-		displayFolder: Capacity
+		displayFolder: 2 Capacity
 		lineageTag: f47d7358-f3ba-4d65-b73c-fe22a9c53fa1
 
 		changedProperty = Name
@@ -128,7 +128,7 @@ table fact_sessions
 
 	measure 'Utilisation %' = DIVIDE ( [Plugged-in Minutes], [Port Days] * 1440 )     // network 41.1 % · Webster 74.5 %
 		formatString: \$#,0;(\$#,0);\$#,0
-		displayFolder: Capacity
+		displayFolder: 2 Capacity
 		lineageTag: ca6989b0-e241-432d-9e6f-7941525b7c58
 
 		changedProperty = Name
@@ -139,7 +139,7 @@ table fact_sessions
 
 	measure 'Idle Share %' = DIVIDE ( [Idle Minutes], [Plugged-in Minutes] )          // network 19.6 %
 		formatString: 0
-		displayFolder: Capacity
+		displayFolder: 2 Capacity
 		lineageTag: fec788fa-85c9-4b13-ad05-74fa7ffc3cc2
 
 		changedProperty = Name
@@ -159,7 +159,7 @@ table fact_sessions
 			
 			```
 		formatString: 0
-		displayFolder: Capacity
+		displayFolder: 2 Capacity
 		lineageTag: 128cae5e-b893-4e76-a2f2-8588392cb32e
 
 		changedProperty = Name
@@ -172,7 +172,7 @@ table fact_sessions
 
 	measure 'Revenue per kWh' = DIVIDE ( [Revenue USD], [Energy kWh] )                // $0.13
 		formatString: \$#,0;(\$#,0);\$#,0
-		displayFolder: Capacity
+		displayFolder: 2 Capacity
 		lineageTag: 9d1a9f75-2b34-4e97-a3d8-240ea672dd48
 
 		changedProperty = Name
@@ -194,7 +194,7 @@ table fact_sessions
 			
 			```
 		formatString: 0
-		displayFolder: Analysis
+		displayFolder: 3 Analysis
 		lineageTag: fca16758-d844-404e-b79f-e9033903454e
 
 		changedProperty = Name
@@ -213,7 +213,7 @@ table fact_sessions
 			)
 			
 			```
-		displayFolder: Analysis
+		displayFolder: 3 Analysis
 		lineageTag: e810a057-5f3e-485c-9e28-8a681461d5aa
 
 		changedProperty = Name
@@ -235,7 +235,7 @@ table fact_sessions
 			    )
 			
 			```
-		displayFolder: Analysis
+		displayFolder: 3 Analysis
 		lineageTag: 469d71a3-1746-458e-ae3b-894b049e01d7
 
 		changedProperty = Name
@@ -261,7 +261,7 @@ table fact_sessions
 			    )
 			
 			```
-		displayFolder: Titles
+		displayFolder: 4 Titles
 		lineageTag: 8f7ed0f9-2e6d-4a16-849f-925cdc0a2fae
 
 		changedProperty = Name
@@ -270,7 +270,7 @@ table fact_sessions
 
 	measure 'Sessions Flagged Negative Idle' = CALCULATE ( [Sessions], fact_sessions[is_duration_anomaly] = TRUE () )
 		formatString: 0
-		displayFolder: Quality
+		displayFolder: 5 Quality
 		lineageTag: 10207e80-68e7-45d8-b481-81c9ca28ca55
 
 		changedProperty = Name
@@ -279,7 +279,7 @@ table fact_sessions
 
 	measure 'Sessions Over 24h' = CALCULATE ( [Sessions], fact_sessions[is_long_session] = TRUE () )
 		formatString: 0
-		displayFolder: Quality
+		displayFolder: 5 Quality
 		lineageTag: 25079335-8d71-4429-ae7b-335f018f8711
 
 		changedProperty = Name
@@ -397,6 +397,8 @@ table fact_sessions
 		sourceLineageTag: energy_kwh
 		summarizeBy: sum
 		sourceColumn: energy_kwh
+
+		changedProperty = DisplayFolder
 
 		annotation SummarizationSetBy = Automatic
 

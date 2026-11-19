@@ -1,0 +1,28 @@
+table 'Time Calc'
+	lineageTag: 89473c3a-8912-4835-94a5-a14043c05b2b
+
+	calculationGroup
+
+		calculationItem Current = SELECTEDMEASURE()
+
+	column 'Time View'
+		dataType: string
+		lineageTag: 606d2100-99e5-43d1-a445-2f701d6c494a
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ordinal
+		dataType: int64
+		formatString: 0
+		lineageTag: b960d40f-d9ee-48df-a971-f6bc3d42e3e2
+		summarizeBy: sum
+		sourceColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Time Calc' = calculationGroup
+		mode: import
+

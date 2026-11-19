@@ -23,6 +23,9 @@ table dim_time
 		sourceLineageTag: hour_label
 		summarizeBy: none
 		sourceColumn: hour_label
+		sortByColumn: hour_of_day
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 

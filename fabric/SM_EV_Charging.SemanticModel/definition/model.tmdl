@@ -2,6 +2,7 @@ model Model
 	culture: en-US
 	collation: Latin1_General_100_BIN2_UTF8
 	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
 	sourceQueryCulture: en-US
 	dataAccessOptions
 		legacyRedirects
@@ -11,7 +12,7 @@ annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_QueryOrder = ["DatabaseQuery"]
 
-annotation PBI_ProTooling = ["WebModelingEdit"]
+annotation PBI_ProTooling = ["WebModelingEdit","CalcGroup","DaxQueryView_Desktop"]
 
 ref table dim_date
 ref table dim_time
@@ -21,4 +22,5 @@ ref table dim_user
 ref table dim_end_reason
 ref table fact_sessions
 ref table security_site_manager
+ref table 'Time Calc'
 
