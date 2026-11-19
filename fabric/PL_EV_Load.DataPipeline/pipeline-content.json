@@ -2,97 +2,12 @@
   "properties": {
     "activities": [
       {
-        "name": "1 Bronze ingest",
-        "description": "(nb_01)",
         "type": "Wait",
-        "dependsOn": [],
         "typeProperties": {
           "waitTimeInSeconds": 1
-        }
-      },
-      {
-        "name": "2 Silver transform",
-        "description": "loads yearly CSVs into bronze_sessions",
-        "type": "Wait",
-        "dependsOn": [
-          {
-            "activity": "1 Bronze ingest",
-            "dependencyConditions": [
-              "Succeeded"
-            ]
-          }
-        ],
-        "typeProperties": {
-          "waitTimeInSeconds": 1
-        }
-      },
-      {
-        "name": "3 Reference data",
-        "description": " (DF_EV_Reference)",
-        "type": "Wait",
-        "dependsOn": [
-          {
-            "activity": "2 Silver transform",
-            "dependencyConditions": [
-              "Succeeded"
-            ]
-          }
-        ],
-        "typeProperties": {
-          "waitTimeInSeconds": 1
-        }
-      },
-      {
-        "name": "4 Copy rejects to WH",
-        "type": "Wait",
-        "dependsOn": [
-          {
-            "activity": "3 Reference data",
-            "dependencyConditions": [
-              "Succeeded"
-            ]
-          }
-        ],
-        "typeProperties": {
-          "waitTimeInSeconds": 1
-        }
-      },
-      {
-        "name": "5 Gold star schema",
-        "description": "sp_run_gold_load",
-        "type": "Wait",
-        "dependsOn": [
-          {
-            "activity": "4 Copy rejects to WH",
-            "dependencyConditions": [
-              "Succeeded"
-            ]
-          }
-        ],
-        "typeProperties": {
-          "waitTimeInSeconds": 1
-        }
-      },
-      {
-        "name": "6 Reconciliation",
-        "description": "nb_03",
-        "type": "Wait",
-        "dependsOn": [
-          {
-            "activity": "5 Gold star schema",
-            "dependencyConditions": [
-              "Succeeded"
-            ]
-          }
-        ],
-        "typeProperties": {
-          "waitTimeInSeconds": 1
-        }
-      },
-      {
+        },
         "name": "7 Refresh model",
         "description": "SM_EV_Charging",
-        "type": "Wait",
         "dependsOn": [
           {
             "activity": "6 Reconciliation",
@@ -100,11 +15,255 @@
               "Succeeded"
             ]
           }
-        ],
+        ]
+      },
+      {
+        "type": "TridentNotebook",
         "typeProperties": {
-          "waitTimeInSeconds": 1
-        }
+          "notebookId": "b09798a3-b358-b490-4ec0-2ca5104ea606",
+          "workspaceId": "00000000-0000-0000-0000-000000000000",
+          "parameters": {
+            "load_years": {
+              "value": {
+                "value": "@pipeline().parameters.years",
+                "type": "Expression"
+              },
+              "type": "string"
+            },
+            "landing_folder": {
+              "value": "Files/landing/sessions",
+              "type": "string"
+            },
+            "load_reference": {
+              "value": false,
+              "type": "bool"
+            }
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 1,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "1 Bronze ingest",
+        "dependsOn": []
+      },
+      {
+        "type": "TridentNotebook",
+        "typeProperties": {
+          "notebookId": "feed82cb-ac40-b155-43c7-33e4192edaff",
+          "workspaceId": "00000000-0000-0000-0000-000000000000",
+          "parameters": {
+            "process_years": {
+              "value": {
+                "value": "@pipeline().parameters.years",
+                "type": "Expression"
+              },
+              "type": "string"
+            }
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 1,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "2 Silver transform",
+        "dependsOn": [
+          {
+            "activity": "1 Bronze ingest",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "RefreshDataflow",
+        "typeProperties": {
+          "dataflowId": "caba7bbf-a8c1-a0f7-4e69-f8b83361d4f5",
+          "workspaceId": "00000000-0000-0000-0000-000000000000",
+          "notifyOption": "NoNotification",
+          "dataflowType": "DataflowFabric",
+          "executeMashupQueriesOnly": true
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 1,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "3 Reference data",
+        "dependsOn": [
+          {
+            "activity": "2 Silver transform",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Copy",
+        "typeProperties": {
+          "source": {
+            "type": "LakehouseTableSource",
+            "datasetSettings": {
+              "type": "LakehouseTable",
+              "typeProperties": {
+                "schema": "dbo",
+                "table": "silver_qa_rejected"
+              },
+              "schema": [],
+              "connectionSettings": {
+                "name": "LH_EV",
+                "properties": {
+                  "type": "Lakehouse",
+                  "typeProperties": {
+                    "artifactId": "a5e06735-88f4-a363-4ca4-76d4a42e0e22",
+                    "workspaceId": "00000000-0000-0000-0000-000000000000",
+                    "rootFolder": "Tables"
+                  },
+                  "externalReferences": {
+                    "connection": "0ec6ea19-28d3-49ad-b01a-268a008f708b"
+                  },
+                  "annotations": []
+                }
+              },
+              "annotations": []
+            }
+          },
+          "sink": {
+            "type": "DataWarehouseSink",
+            "tableOption": "autoCreate",
+            "preCopyScript": "IF OBJECT_ID('stg.qa_rejected') IS NOT NULL TRUNCATE TABLE stg.qa_rejected;",
+            "allowCopyCommand": true,
+            "copyCommandSettings": {},
+            "writeBehavior": "Insert",
+            "disableMetricsCollection": false,
+            "datasetSettings": {
+              "type": "DataWarehouseTable",
+              "typeProperties": {
+                "schema": "stg",
+                "table": "qa_rejected"
+              },
+              "schema": [],
+              "connectionSettings": {
+                "name": "WH_EV_Gold",
+                "properties": {
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "artifactId": "f530373f-8a0e-b0f9-4ca6-7906baf7efc9",
+                    "endpoint": "ruay3dpntveetnqqchvcrexg5m-ukulp74bl2xu7dis5tqcct7c6e.datawarehouse.fabric.microsoft.com",
+                    "workspaceId": "00000000-0000-0000-0000-000000000000"
+                  },
+                  "externalReferences": {
+                    "connection": "dea92474-6c42-426b-9733-57e494095b72"
+                  },
+                  "annotations": []
+                }
+              },
+              "annotations": []
+            }
+          },
+          "translator": {
+            "type": "TabularTranslator",
+            "typeConversion": true,
+            "typeConversionSettings": {
+              "allowDataTruncation": true,
+              "treatBooleanAsNumber": false
+            }
+          },
+          "enableStaging": true
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "4 Copy rejects to WH",
+        "dependsOn": [
+          {
+            "activity": "3 Reference data",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SqlServerStoredProcedure",
+        "typeProperties": {
+          "storedProcedureName": "[gold].[sp_run_gold_load]"
+        },
+        "connectionSettings": {
+          "name": "WH_EV_Gold",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "f530373f-8a0e-b0f9-4ca6-7906baf7efc9",
+              "endpoint": "ruay3dpntveetnqqchvcrexg5m-ukulp74bl2xu7dis5tqcct7c6e.datawarehouse.fabric.microsoft.com",
+              "workspaceId": "00000000-0000-0000-0000-000000000000"
+            },
+            "externalReferences": {
+              "connection": "dea92474-6c42-426b-9733-57e494095b72"
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 1,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "5 Gold star schema",
+        "dependsOn": [
+          {
+            "activity": "4 Copy rejects to WH",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "TridentNotebook",
+        "typeProperties": {
+          "notebookId": "d12b7b5c-13aa-8edd-44e4-ea4e1e186d90",
+          "workspaceId": "00000000-0000-0000-0000-000000000000"
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 1,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "6 Reconciliation",
+        "dependsOn": [
+          {
+            "activity": "5 Gold star schema",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
       }
-    ]
+    ],
+    "parameters": {
+      "years": {
+        "type": "string",
+        "defaultValue": "2011,2012,2013,2014,2015,2016,2017,2018,2019,2020"
+      }
+    }
   }
 }

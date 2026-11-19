@@ -5,7 +5,59 @@
   },
   "name": "DF_EV_Reference",
   "queryGroups": [],
-  "documentLocale": "en",
-  "queriesMetadata": {},
-  "connections": []
+  "documentLocale": "en-US",
+  "queriesMetadata": {
+    "end_reason_mapping": {
+      "queryId": "bb1e2cd7-1c04-4ccd-a630-73a121b5dec7",
+      "queryName": "end_reason_mapping"
+    },
+    "site_reference": {
+      "queryId": "07dd29df-3d0a-49fd-8052-166c6998ccc6",
+      "queryName": "site_reference"
+    },
+    "site_reference_change": {
+      "queryId": "a93eede2-6497-47e3-9c55-ed6e26f4a466",
+      "queryName": "site_reference_change"
+    },
+    "site_managers": {
+      "queryId": "71a75b5b-3c2c-41bf-a8e2-273cd5e4667e",
+      "queryName": "site_managers"
+    },
+    "site_managers_DataDestination": {
+      "queryId": "d9caede2-f183-4834-b595-f63c494d1882",
+      "queryName": "site_managers_DataDestination",
+      "isHidden": true,
+      "loadEnabled": false
+    },
+    "end_reason_mapping_DataDestination": {
+      "queryId": "b10efece-0abe-4f37-b6df-be40143f3571",
+      "queryName": "end_reason_mapping_DataDestination",
+      "isHidden": true,
+      "loadEnabled": false
+    },
+    "site_reference_DataDestination": {
+      "queryId": "671db09e-f8d5-43f4-a6e2-d7e04341e080",
+      "queryName": "site_reference_DataDestination",
+      "isHidden": true,
+      "loadEnabled": false
+    },
+    "site_reference_change_DataDestination": {
+      "queryId": "d75200fb-1925-4e75-b7ae-7566247bb16d",
+      "queryName": "site_reference_change_DataDestination",
+      "isHidden": true,
+      "loadEnabled": false
+    }
+  },
+  "connections": [
+    {
+      "path": "Lakehouse",
+      "kind": "Lakehouse",
+      "connectionId": "{\"ClusterId\":\"4ebc9443-9e28-470b-9132-9e1bc0da448e\",\"DatasourceId\":\"0ec6ea19-28d3-49ad-b01a-268a008f708b\"}"
+    },
+    {
+      "path": "Warehouse",
+      "kind": "Warehouse",
+      "connectionId": "{\"ClusterId\":\"4ebc9443-9e28-470b-9132-9e1bc0da448e\",\"DatasourceId\":\"dea92474-6c42-426b-9733-57e494095b72\"}"
+    }
+  ]
 }
