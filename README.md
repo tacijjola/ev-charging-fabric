@@ -1,2 +1,2 @@
 # ev-charging-fabric
-End-to-end Microsoft Fabric build of a city EV charging network (259k sessions): PySpark lakehouse, T-SQL warehouse with SCD2, Direct Lake model with RLS, orchestrated pipeline.
+Fabric screenshots included; T-SQL and DAX not yet run end-to-end in Fabric; Test as role blocked by SSO.
