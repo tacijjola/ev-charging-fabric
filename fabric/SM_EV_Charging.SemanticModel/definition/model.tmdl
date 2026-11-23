@@ -23,4 +23,7 @@ ref table dim_end_reason
 ref table fact_sessions
 ref table security_site_manager
 ref table 'Time Calc'
+ref table 'KPI Selector'
+
+ref role 'Site Manager'
 

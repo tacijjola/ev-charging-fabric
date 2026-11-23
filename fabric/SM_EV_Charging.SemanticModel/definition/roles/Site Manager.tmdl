@@ -1,0 +1,19 @@
+role 'Site Manager'
+	modelPermission: read
+
+	tablePermission dim_site =
+			[site_code]
+			    IN CALCULATETABLE (
+			        VALUES ( security_site_manager[site_code] ),
+			        security_site_manager[manager_upn] = USERPRINCIPALNAME ()
+			    )
+
+	tablePermission dim_station =
+			[site_code]
+			    IN CALCULATETABLE (
+			        VALUES ( security_site_manager[site_code] ),
+			        security_site_manager[manager_upn] = USERPRINCIPALNAME ()
+			    )
+
+	annotation PBI_Id = 887bfd13df25476e9454227cda9e01ae
+

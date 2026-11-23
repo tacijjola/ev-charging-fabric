@@ -1,0 +1,51 @@
+table 'KPI Selector'
+	lineageTag: a00fef68-cf16-4b27-97fb-484f6ed2c3aa
+
+	column 'KPI Selector'
+		lineageTag: 54910913-b61c-4781-b009-c4933791cb8f
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'KPI Selector Order'
+
+		relatedColumnDetails
+			groupByColumn: 'KPI Selector Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'KPI Selector Fields'
+		isHidden
+		lineageTag: d6267d9d-352a-4952-8f15-2c80016e467b
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'KPI Selector Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'KPI Selector Order'
+		isHidden
+		formatString: 0
+		lineageTag: 1de21bf0-0ccf-4feb-9827-92ef97b0f181
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'KPI Selector' = calculated
+		mode: import
+		source =
+				{
+				    ("kWh per Port per Day", NAMEOF('fact_sessions'[kWh per Port per Day]), 0),
+				    ("Utilisation %", NAMEOF('fact_sessions'[Utilisation %]), 1),
+				    ("Idle Share %", NAMEOF('fact_sessions'[Idle Share %]), 2),
+				    ("Fault Rate %", NAMEOF('fact_sessions'[Fault Rate %]), 3),
+				    ("Revenue per kWh", NAMEOF('fact_sessions'[Revenue per kWh]), 4)
+				}
+
+	annotation PBI_Id = 269ff2a2877648699444b63995f23364
+
